@@ -3,7 +3,7 @@ class SistemaComercioFacade:
     def __init__(self):
         # Inicializa os subsistemas
         self.sistemaCadastro = SistemaCadastro()
-        self.sistemaAutenticacao = SistemaAutenticacao(self.sistemaCadastro)
+        self.sistemaAutenticacaoProxy = SistemaAutenticacaoProxy(self.sistemaCadastro)
         self.sistemaPedidos = SistemaPedidos()
 
     # Método para cadastrar um usuário no sistema
@@ -13,7 +13,7 @@ class SistemaComercioFacade:
     # Método para fazer um pedido no sistema
     def fazer_pedido(self, usuario, senha, produtos):
         # Verifica a autenticação do usuário antes de fazer um pedido
-        if self.sistemaAutenticacao.autenticar(usuario, senha):
+        if self.sistemaAutenticacaoProxy.autenticar(usuario, senha):
             self.sistemaPedidos.fazer_pedido(usuario, produtos)
         else:
             print('Falha na autenticação. Pedido não realizado, veja se você está realmente cadastrado.\n')
@@ -43,21 +43,43 @@ class SistemaAutenticacao:
         return False
 
 
+# Classe SistemaAutenticacaoProxy - Proxy para SistemaAutenticacao
+class SistemaAutenticacaoProxy:
+    def __init__(self, sistemaCadastro):
+        self.sistemaAutenticacao = SistemaAutenticacao(sistemaCadastro)
+        self.usuario_autenticado = None
+
+    # Método para autenticar um usuário
+    def autenticar(self, usuario, senha):
+        if self.usuario_autenticado:
+            return True  # Já autenticado, permita a ação
+
+        if self.sistemaAutenticacao.autenticar(usuario, senha):
+            self.usuario_autenticado = usuario
+            return True
+
+        return False
+
+
 # Classe SistemaPedidos - subsistema para fazer pedidos
 class SistemaPedidos:
     # Método para fazer um pedido
     def fazer_pedido(self, usuario, produtos):
         print(f'Pedido de {", ".join(produtos)} feito por {usuario}\n')
 
+# Criando pedido e login do usuario
+produtos = ['Camisa', 'Calça', 'Tênis']
+usuario = 'Victor'
+senha = '123'
 
 # Instanciar a fachada do sistema de comércio
 comercio_facade = SistemaComercioFacade()
 
 # Tentar fazer um pedido antes de cadastrar um usuário
-comercio_facade.fazer_pedido('victor', '123', ['produto1', 'produto2'])  # Usuário não cadastrado
+comercio_facade.fazer_pedido(usuario, senha, produtos)  # Usuário não cadastrado
 
 # Cadastrar um usuário
-comercio_facade.cadastrar_usuario('victor', '123')
+comercio_facade.cadastrar_usuario(usuario, senha)
 
 # Fazer um pedido após o cadastro
-comercio_facade.fazer_pedido('victor', '123', ['produto1', 'produto2', 'arroz'])  # Autenticação bem-sucedida e Pedido realizado
+comercio_facade.fazer_pedido(usuario, senha, produtos)  # Autenticação bem-sucedida e Pedido realizado

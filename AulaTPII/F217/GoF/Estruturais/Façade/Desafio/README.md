@@ -15,3 +15,7 @@ O sistema deve ser projetado de forma a lidar com casos de sucesso e falha na au
 ## Linguagem de Programação
 
 Você deve implementar inicialmente o sistema em JavaScript e, em seguida, converter o código para Python.
+
+## Parte II do Desafio
+
+- Completar o projeto anterior de comercio eletronico com o uso do Proxy 
